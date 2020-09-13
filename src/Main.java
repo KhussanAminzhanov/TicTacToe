@@ -16,20 +16,38 @@ public class Main {
         System.out.println("---------");
     }
 
-    public static boolean checkImpossibility(String field) {
-        int[] arr = new int[2];
-        // count numbers of 'X' and 'O'
-        for (int i = 0; i < field.length(); i++) {
-            if (field.charAt(i) == 'O') arr[0]++;
-            else if (field.charAt(i) == 'X') arr[1]++;
+    public static boolean checkCountXO(char[][] field) {
+        int x = 0, o = 0;
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (field[i][j] == 'x' || field[i][j] == 'X') x++;
+                else if (field[i][j] == 'o' || field[i][j] == 'O') o++;
+            }
         }
-        return Math.abs(arr[0] - arr[1]) >= 2;
+        return Math.abs(x - o) >= 2;
+    }
+
+    public static boolean checkRowsAndColumnsImp(char[][] field) {
+        return false;
+    }
+
+    public static char[][] convertToMatrix(String state) {
+        char[][] field = new char[3][3];
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                field[i][j] = state.charAt(i*3+j);
+            }
+        }
+        return field;
     }
 
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
         System.out.print("Enter cells: ");
         String state = input.nextLine();
+        if (state.length() < 9) state = state + ".".repeat(9 - state.length());
         printField(state);
+        char[][] field = convertToMatrix(state);
+        System.out.println(checkCountXO(field));
     }
 }
