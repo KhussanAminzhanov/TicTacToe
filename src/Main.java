@@ -4,31 +4,47 @@ public class Main {
     public static void printField(String field) {
         System.out.println("---------");
         for (int i = 0; i < 3; i++) {
-            System.out.println(
-                    String.format(
-                        "| %c %c %c |",
-                        field.charAt(i*3),
-                        field.charAt(1+(i*3)),
-                        field.charAt(2+(i*3))
-                    )
+            System.out.printf(
+                    "| %c %c %c |%n",
+                    field.charAt(i*3),
+                    field.charAt(1+(i*3)),
+                    field.charAt(2+(i*3))
             );
         }
         System.out.println("---------");
+    }
+
+    public static int[] getCountThreeInRow(char[][] field, char c) {
+        // count[0] = row
+        // count[1] = column
+        // count[2] = diagonal
+        int[] count = new int[3];
+        int row = 0, column = 0, diagonal = 0, revDiagonal = 0;
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (field[i][j] == c) row++;
+                if (field[j][i] == c) column++;
+            }
+            if (row == 3) count[0]++;
+            if (column == 3) count[1]++;
+            row = 0; column = 0;
+            if (field[i][i] == c) diagonal++;
+            if (field[i][2-i] == c) revDiagonal++;
+        }
+        if (diagonal == 3) count[2]++;
+        if (revDiagonal == 3) count[2]++;
+        return count;
     }
 
     public static boolean checkCountXO(char[][] field) {
         int x = 0, o = 0;
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                if (field[i][j] == 'x' || field[i][j] == 'X') x++;
-                else if (field[i][j] == 'o' || field[i][j] == 'O') o++;
+                if (field[i][j] == 'x') x++;
+                else if (field[i][j] == 'o') o++;
             }
         }
         return Math.abs(x - o) >= 2;
-    }
-
-    public static boolean checkRowsAndColumnsImp(char[][] field) {
-        return false;
     }
 
     public static char[][] convertToMatrix(String state) {
@@ -39,6 +55,18 @@ public class Main {
             }
         }
         return field;
+    }
+
+    public static int getSum(int[] arr) {
+        int sum = 0;
+        for (int j : arr) sum += j;
+        return sum;
+    }
+
+    public static boolean checkImpossibility(char[][] field) {
+        int countX = getSum(getCountThreeInRow(field, 'x'));
+        int countO = getSum(getCountThreeInRow(field, 'o'));
+        return (countO < 1 && countX  < 1) || checkCountXO(field);
     }
 
     public static void main(String[] args) {
