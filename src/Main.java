@@ -15,25 +15,22 @@ public class Main {
         System.out.println("---------");
     }
 
-    public static int[] getCountThreeInRow(char[][] field, char c) {
-        // count[0] = row
-        // count[1] = column
-        // count[2] = diagonal
-        int[] count = new int[3];
+    public static int getCountThreeInRow(char[][] field, char c) {
+        int count = 0;
         int row = 0, column = 0, diagonal = 0, revDiagonal = 0;
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 if (field[i][j] == c) row++;
                 if (field[j][i] == c) column++;
             }
-            if (row == 3) count[0]++;
-            if (column == 3) count[1]++;
+            if (row == 3) count++;
+            if (column == 3) count++;
             row = 0; column = 0;
             if (field[i][i] == c) diagonal++;
             if (field[i][2-i] == c) revDiagonal++;
         }
-        if (diagonal == 3) count[2]++;
-        if (revDiagonal == 3) count[2]++;
+        if (diagonal == 3) count++;
+        if (revDiagonal == 3) count++;
         return count;
     }
 
@@ -58,12 +55,6 @@ public class Main {
         return field;
     }
 
-    public static int getSum(int[] arr) {
-        int sum = 0;
-        for (int j : arr) sum += j;
-        return sum;
-    }
-
     public static boolean checkImpossibility(char[][] field, int countO, int countX) {
         return (countO > 0 && countX  > 0) || checkCountXO(field);
     }
@@ -84,8 +75,8 @@ public class Main {
         state = state.toUpperCase();
         if (state.length() < 9) state = state + "_".repeat(9 - state.length());
         char[][] field = convertToMatrix(state);
-        int countX = getSum(getCountThreeInRow(field, 'X'));
-        int countO = getSum(getCountThreeInRow(field, 'O'));
+        int countX = getCountThreeInRow(field, 'X');
+        int countO = getCountThreeInRow(field, 'O');
 
         if (checkImpossibility(field, countX, countO)) System.out.println("Impossible");
         else if (checkDraw(state, countX, countO)) System.out.println("Draw");
