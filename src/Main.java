@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.util.stream.IntStream;
 
 public class Main {
     public static void printField(String field) {
@@ -40,11 +41,11 @@ public class Main {
         int x = 0, o = 0;
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                if (field[i][j] == 'x') x++;
-                else if (field[i][j] == 'o') o++;
+                if (field[i][j] == 'X') x++;
+                else if (field[i][j] == 'O') o++;
             }
         }
-        return Math.abs(x - o) >= 2;
+        return Math.abs(x - o) > 1;
     }
 
     public static char[][] convertToMatrix(String state) {
@@ -63,19 +64,41 @@ public class Main {
         return sum;
     }
 
-    public static boolean checkImpossibility(char[][] field) {
-        int countX = getSum(getCountThreeInRow(field, 'x'));
-        int countO = getSum(getCountThreeInRow(field, 'o'));
-        return (countO < 1 && countX  < 1) || checkCountXO(field);
+    public static boolean checkImpossibility(char[][] field, int countO, int countX) {
+        return (countO > 0 && countX  > 0) || checkCountXO(field);
+    }
+
+    public static boolean hasEmptyCell(String state) {
+        return IntStream.range(0, state.length()).anyMatch(i -> state.charAt(i) == '_');
+    }
+
+    public static boolean checkDraw(String state, int countO, int countX) {
+        return !hasEmptyCell(state) && countO == 0 && countX == 0;
+    }
+
+    public static boolean checkGameNotFinished(String state, int countO, int countX) {
+        return hasEmptyCell(state) && countO == 0 && countX == 0;
+    }
+
+    public static void checkState(String state) {
+        state = state.toUpperCase();
+        if (state.length() < 9) state = state + "_".repeat(9 - state.length());
+        char[][] field = convertToMatrix(state);
+        int countX = getSum(getCountThreeInRow(field, 'X'));
+        int countO = getSum(getCountThreeInRow(field, 'O'));
+
+        if (checkImpossibility(field, countX, countO)) System.out.println("Impossible");
+        else if (checkDraw(state, countX, countO)) System.out.println("Draw");
+        else if (checkGameNotFinished(state, countX, countO)) System.out.println("Game not finished");
+        else if (countX == 1) System.out.println("X wins");
+        else if (countO == 1) System.out.println("O wins");
     }
 
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
         System.out.print("Enter cells: ");
         String state = input.nextLine();
-        if (state.length() < 9) state = state + ".".repeat(9 - state.length());
         printField(state);
-        char[][] field = convertToMatrix(state);
-        System.out.println(checkCountXO(field));
+        checkState(state);
     }
 }
