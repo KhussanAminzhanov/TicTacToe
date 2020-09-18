@@ -1,6 +1,6 @@
 import java.util.InputMismatchException;
+import java.util.Objects;
 import java.util.Scanner;
-import java.util.stream.IntStream;
 
 public class Main {
     public static void printField(char[][] field) {
@@ -60,57 +60,56 @@ public class Main {
         return (countO > 0 && countX  > 0) || checkCountXO(field);
     }
 
-    public static boolean hasEmptyCell(String state) {
-        return IntStream.range(0, state.length()).anyMatch(i -> state.charAt(i) == '_');
+    public static boolean hasEmptyCell(char[][] field) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (field[i][j] == ' ') return true;
+            }
+        }
+        return false;
     }
 
-    public static boolean checkDraw(String state, int countO, int countX) {
-        return !hasEmptyCell(state) && countO == 0 && countX == 0;
+    public static boolean checkDraw(char[][] field, int countO, int countX) {
+        return !hasEmptyCell(field) && countO == 0 && countX == 0;
     }
 
-    public static boolean checkGameNotFinished(String state, int countO, int countX) {
-        return hasEmptyCell(state) && countO == 0 && countX == 0;
+    public static boolean checkGameNotFinished(char[][] field, int countO, int countX) {
+        return hasEmptyCell(field) && countO == 0 && countX == 0;
     }
 
-    public static void checkState(String state, char[][] field) {
+    public static String checkField(char[][] field) {
         int countX = getCountThreeInRow(field, 'X');
         int countO = getCountThreeInRow(field, 'O');
 
-        if (checkImpossibility(field, countX, countO)) System.out.println("Impossible");
-        else if (checkDraw(state, countX, countO)) System.out.println("Draw");
-        else if (checkGameNotFinished(state, countX, countO)) System.out.println("Game not finished");
-        else if (countX == 1) System.out.println("X wins");
-        else if (countO == 1) System.out.println("O wins");
-    }
-
-    public static char[][] enterCell(char[][] field, int col, int row) {
-        return field;
+        if (checkImpossibility(field, countX, countO)) return "Impossible";//System.out.println("Impossible");
+        else if (checkDraw(field, countX, countO)) return "Draw"; //System.out.println("Draw");
+        else if (checkGameNotFinished(field, countX, countO)) return "Game not finished"; //System.out.println("Game not finished");
+        else if (countX == 1) return "X wins"; //System.out.println("X wins");
+        else if (countO == 1) return "O wins"; //System.out.println("O wins");
+        return "";
     }
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-
-        System.out.print("Enter cells: ");
-        String state = scanner.nextLine();
-
-        state = state.toUpperCase();
-        if (state.length() < 9) state = state + "_".repeat(9 - state.length());
-        char[][] field = convertToMatrix(state);
-
+        String state;
+        char[][] field = convertToMatrix(" ".repeat(9));
+        char move = 'O';
         printField(field);
-
-        while (true) {
+        while (hasEmptyCell(field)) {
             try {
                 System.out.print("Enter the coordinates: ");
                 int col = scanner.nextInt();
                 int row = scanner.nextInt();
                 if (col > 3 || row > 3 || col < 0 || row < 0) {
                     System.out.println("Coordinates should be from 1 to 3!");
-                } else if (field[3-row][col - 1] != '_') {
+                } else if (field[3-row][col - 1] != ' ') {
                     System.out.println("This cell is occupied! Choose another one!");
                 } else {
-                    field[3-row][col-1] = 'X';
-                    break;
+                    move = move == 'O' ? 'X' : 'O';
+                    field[3-row][col-1] = move;
+                    state = checkField(field);
+                    printField(field);
+                    if (Objects.equals(state, "X wins") || Objects.equals(state, "O wins")) break;
                 }
             } catch (InputMismatchException err) {
                 System.out.println("You should enter numbers!");
@@ -118,7 +117,6 @@ public class Main {
             }
         }
 
-        printField(field);
-
+        System.out.println(checkField(field));
     }
 }
