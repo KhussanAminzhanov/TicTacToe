@@ -1,15 +1,16 @@
+import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.stream.IntStream;
 
 public class Main {
-    public static void printField(String field) {
+    public static void printField(char[][] field) {
         System.out.println("---------");
         for (int i = 0; i < 3; i++) {
             System.out.printf(
                     "| %c %c %c |%n",
-                    field.charAt(i*3),
-                    field.charAt(1+(i*3)),
-                    field.charAt(2+(i*3))
+                    field[i][0],
+                    field[i][1],
+                    field[i][2]
             );
         }
         System.out.println("---------");
@@ -71,10 +72,7 @@ public class Main {
         return hasEmptyCell(state) && countO == 0 && countX == 0;
     }
 
-    public static void checkState(String state) {
-        state = state.toUpperCase();
-        if (state.length() < 9) state = state + "_".repeat(9 - state.length());
-        char[][] field = convertToMatrix(state);
+    public static void checkState(String state, char[][] field) {
         int countX = getCountThreeInRow(field, 'X');
         int countO = getCountThreeInRow(field, 'O');
 
@@ -85,11 +83,42 @@ public class Main {
         else if (countO == 1) System.out.println("O wins");
     }
 
+    public static char[][] enterCell(char[][] field, int col, int row) {
+        return field;
+    }
+
     public static void main(String[] args) {
-        Scanner input = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in);
+
         System.out.print("Enter cells: ");
-        String state = input.nextLine();
-        printField(state);
-        checkState(state);
+        String state = scanner.nextLine();
+
+        state = state.toUpperCase();
+        if (state.length() < 9) state = state + "_".repeat(9 - state.length());
+        char[][] field = convertToMatrix(state);
+
+        printField(field);
+
+        while (true) {
+            try {
+                System.out.print("Enter the coordinates: ");
+                int col = scanner.nextInt();
+                int row = scanner.nextInt();
+                if (col > 3 || row > 3 || col < 0 || row < 0) {
+                    System.out.println("Coordinates should be from 1 to 3!");
+                } else if (field[3-row][col - 1] != '_') {
+                    System.out.println("This cell is occupied! Choose another one!");
+                } else {
+                    field[3-row][col-1] = 'X';
+                    break;
+                }
+            } catch (InputMismatchException err) {
+                System.out.println("You should enter numbers!");
+                scanner.nextLine();
+            }
+        }
+
+        printField(field);
+
     }
 }
